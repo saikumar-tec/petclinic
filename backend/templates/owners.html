@@ -1,0 +1,196 @@
+<script>
+
+// ============================
+// Load Owners
+// ============================
+
+loadOwners();
+
+function loadOwners(){
+
+    fetch("/owners")
+
+    .then(response => response.json())
+
+    .then(data=>{
+
+        let rows="";
+
+        data.forEach(owner=>{
+
+            rows+=`
+
+            <tr>
+
+                <td>${owner.id}</td>
+
+                <td>${owner.name}</td>
+
+                <td>${owner.phone}</td>
+
+                <td>${owner.email}</td>
+
+                <td>${owner.address}</td>
+
+                <td>
+
+                    <button
+                        class="btn btn-warning btn-sm"
+                        onclick="editOwner(${owner.id})">
+
+                        Edit
+
+                    </button>
+
+                    <button
+                        class="btn btn-danger btn-sm"
+                        onclick="deleteOwner(${owner.id})">
+
+                        Delete
+
+                    </button>
+
+                </td>
+
+            </tr>
+
+            `;
+
+        });
+
+        document.getElementById("ownerTable").innerHTML=rows;
+
+    });
+
+}
+
+
+// ============================
+// Add Owner
+// ============================
+
+document.getElementById("ownerForm")
+
+.addEventListener("submit",function(e){
+
+e.preventDefault();
+
+fetch("/owners",{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+name:document.getElementById("name").value,
+
+phone:document.getElementById("phone").value,
+
+email:document.getElementById("email").value,
+
+address:document.getElementById("address").value
+
+})
+
+})
+
+.then(response=>response.json())
+
+.then(data=>{
+
+alert(data.message);
+
+location.reload();
+
+});
+
+});
+
+
+// ============================
+// Delete Owner
+// ============================
+
+function deleteOwner(id){
+
+if(confirm("Delete this owner?")){
+
+fetch("/owners/"+id,{
+
+method:"DELETE"
+
+})
+
+.then(response=>response.json())
+
+.then(data=>{
+
+alert(data.message);
+
+loadOwners();
+
+});
+
+}
+
+}
+
+
+// ============================
+// Edit Owner
+// ============================
+
+function editOwner(id){
+
+let name=prompt("Owner Name");
+
+if(name==null) return;
+
+let phone=prompt("Phone");
+
+let email=prompt("Email");
+
+let address=prompt("Address");
+
+fetch("/owners/"+id,{
+
+method:"PUT",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+name:name,
+
+phone:phone,
+
+email:email,
+
+address:address
+
+})
+
+})
+
+.then(response=>response.json())
+
+.then(data=>{
+
+alert(data.message);
+
+loadOwners();
+
+});
+
+}
+
+</script>

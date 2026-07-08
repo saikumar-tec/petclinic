@@ -1,0 +1,80 @@
+version: "3.9"
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: petclinic-mysql
+
+    restart: always
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: petclinic
+      MYSQL_USER: petuser
+      MYSQL_PASSWORD: pet123
+
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+    networks:
+      - petclinic-network
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot123"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+
+    container_name: petclinic-backend
+
+    restart: always
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: petclinic
+      DB_USER: petuser
+      DB_PASSWORD: pet123
+
+    ports:
+      - "5000:5000"
+
+    networks:
+      - petclinic-network
+
+  frontend:
+    build:
+      context: ./frontend
+
+    container_name: petclinic-frontend
+
+    restart: always
+
+    depends_on:
+      - backend
+
+    ports:
+      - "8080:80"
+
+    networks:
+      - petclinic-network
+
+volumes:
+  mysql-data:
+
+networks:
+  petclinic-network:
+    driver: bridge

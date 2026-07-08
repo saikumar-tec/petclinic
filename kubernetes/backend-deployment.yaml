@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: backend
+  namespace: petclinic
+
+spec:
+
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: backend
+
+  template:
+
+    metadata:
+      labels:
+        app: backend
+
+    spec:
+
+      containers:
+
+      - name: backend
+
+        image: saikumaar/backend1:latest 
+        imagePullPolicy: Always
+
+        ports:
+
+        - containerPort: 5000
+
+        env:
+
+        - name: DB_HOST
+          value: mysql
+
+        - name: DB_NAME
+          value: petclinic
+
+        - name: DB_USER
+          value: root
+
+        - name: DB_PASSWORD
+          value: root123

@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+
+{% block title %}Appointments{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2>📅 Appointment Management</h2>
+
+        <button class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#appointmentModal">
+
+            <i class="bi bi-plus-circle"></i>
+            Book Appointment
+
+        </button>
+
+    </div>
+
+    <div class="card shadow">
+
+        <div class="card-header bg-primary text-white">
+
+            Appointment List
+
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-bordered table-hover">
+
+                <thead class="table-light">
+
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Pet ID</th>
+                        <th>Doctor ID</th>
+                        <th>Date</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="appointmentTable">
+
+                    <tr>
+
+                        <td colspan="8" class="text-center">
+
+                            Loading...
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Appointment Modal -->
+
+<div class="modal fade" id="appointmentModal">
+
+<div class="modal-dialog">
+
+<div class="modal-content">
+
+<div class="modal-header">
+
+<h5>Book Appointment</h5>
+
+<button class="btn-close"
+data-bs-dismiss="modal"></button>
+
+</div>
+
+<div class="modal-body">
+
+<form id="appointmentForm">
+
+<div class="mb-3">
+
+<label>Pet ID</label>
+
+<input
+type="number"
+id="pet_id"
+class="form-control"
+required>
+
+</div>
+
+<div class="mb-3">
+
+<label>Doctor ID</label>
+
+<input
+type="number"
+id="doctor_id"
+class="form-control"
+required>
+
+</div>
+
+<div class="mb-3">
+
+<label>Date</label>
+
+<input
+type="datetime-local"
+id="appointment_date"
+class="form-control"
+required>
+
+</div>
+
+<div class="mb-3">
+
+<label>Reason</label>
+
+<input
+id="reason"
+class="form-control">
+
+</div>
+
+<div class="mb-3">
+
+<label>Status</label>
+
+<select
+id="status"
+class="form-select">
+
+<option>Scheduled</option>
+
+<option>Completed</option>
+
+<option>Cancelled</option>
+
+</select>
+
+</div>
+
+<div class="mb-3">
+
+<label>Notes</label>
+
+<textarea
+id="notes"
+class="form-control"></textarea>
+
+</div>
+
+<button
+class="btn btn-success">
+
+Save Appointment
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+loadAppointments();
+
+function loadAppointments(){
+
+fetch("/appointments")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+let rows="";
+
+data.forEach(a=>{
+
+rows+=`
+
+<tr>
+
+<td>${a.id}</td>
+
+<td>${a.pet_id}</td>
+
+<td>${a.doctor_id}</td>
+
+<td>${a.date || a.appointment_date}</td>
+
+<td>${a.reason}</td>
+
+<td>
+
+<span class="badge bg-success">
+
+${a.status}
+
+</span>
+
+</td>
+
+<td>${a.notes}</td>
+
+<td>
+
+<button
+class="btn btn-warning btn-sm"
+
+onclick="editAppointment(${a.id})">
+
+Edit
+
+</button>
+
+<button
+class="btn btn-danger btn-sm"
+
+onclick="deleteAppointment(${a.id})">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+document.getElementById("appointmentTable").innerHTML=rows;
+
+});
+
+}
+
+document.getElementById("appointmentForm")
+
+.addEventListener("submit",function(e){
+
+e.preventDefault();
+
+fetch("/appointments",{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+pet_id:document.getElementById("pet_id").value,
+
+doctor_id:document.getElementById("doctor_id").value,
+
+appointment_date:document.getElementById("appointment_date").value,
+
+reason:document.getElementById("reason").value,
+
+status:document.getElementById("status").value,
+
+notes:document.getElementById("notes").value
+
+})
+
+})
+
+.then(res=>res.json())
+
+.then(data=>{
+
+alert(data.message);
+
+location.reload();
+
+});
+
+});
+
+function deleteAppointment(id){
+
+if(confirm("Delete Appointment?")){
+
+fetch("/appointments/"+id,{
+
+method:"DELETE"
+
+})
+
+.then(res=>res.json())
+
+.then(data=>{
+
+alert(data.message);
+
+loadAppointments();
+
+});
+
+}
+
+}
+
+function editAppointment(id){
+
+let status=prompt("Status");
+
+if(status==null) return;
+
+fetch("/appointments/"+id,{
+
+method:"PUT",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+status:status
+
+})
+
+})
+
+.then(res=>res.json())
+
+.then(data=>{
+
+alert(data.message);
+
+loadAppointments();
+
+});
+
+}
+
+</script>
+
+{% endblock %}

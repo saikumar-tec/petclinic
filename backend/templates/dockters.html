@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+
+{% block title %}Doctors{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2>👨‍⚕️ Doctor Management</h2>
+
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doctorModal">
+            <i class="bi bi-plus-circle"></i> Add Doctor
+        </button>
+
+    </div>
+
+    <div class="card shadow">
+
+        <div class="card-header bg-primary text-white">
+            Doctors List
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-striped table-hover">
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Specialization</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="doctorTable">
+
+                    <tr>
+                        <td colspan="6" class="text-center">Loading...</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Add Doctor Modal -->
+
+<div class="modal fade" id="doctorModal">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5>Add Doctor</h5>
+
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <form id="doctorForm">
+
+                    <div class="mb-3">
+
+                        <label>Name</label>
+
+                        <input id="name" class="form-control" required>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label>Specialization</label>
+
+                        <input id="specialization" class="form-control" required>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label>Phone</label>
+
+                        <input id="phone" class="form-control">
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label>Email</label>
+
+                        <input id="email" class="form-control">
+
+                    </div>
+
+                    <button class="btn btn-success">
+
+                        Save Doctor
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+loadDoctors();
+
+function loadDoctors(){
+
+fetch("/doctors")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+let rows="";
+
+data.forEach(doc=>{
+
+rows+=`
+
+<tr>
+
+<td>${doc.id}</td>
+
+<td>${doc.name}</td>
+
+<td>${doc.specialization}</td>
+
+<td>${doc.phone}</td>
+
+<td>${doc.email}</td>
+
+<td>
+
+<button class="btn btn-warning btn-sm"
+
+onclick="editDoctor(${doc.id})">
+
+Edit
+
+</button>
+
+<button class="btn btn-danger btn-sm"
+
+onclick="deleteDoctor(${doc.id})">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+document.getElementById("doctorTable").innerHTML=rows;
+
+});
+
+}
+
+document.getElementById("doctorForm")
+
+.addEventListener("submit",function(e){
+
+e.preventDefault();
+
+fetch("/doctors",{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+name:document.getElementById("name").value,
+
+specialization:document.getElementById("specialization").value,
+
+phone:document.getElementById("phone").value,
+
+email:document.getElementById("email").value
+
+})
+
+})
+
+.then(res=>res.json())
+
+.then(data=>{
+
+alert(data.message);
+
+location.reload();
+
+});
+
+});
+
+function deleteDoctor(id){
+
+if(confirm("Delete Doctor?")){
+
+fetch("/doctors/"+id,{
+
+method:"DELETE"
+
+})
+
+.then(res=>res.json())
+
+.then(data=>{
+
+alert(data.message);
+
+loadDoctors();
+
+});
+
+}
+
+}
+
+function editDoctor(id){
+
+let name=prompt("Doctor Name");
+
+if(name==null)return;
+
+let specialization=prompt("Specialization");
+
+let phone=prompt("Phone");
+
+let email=prompt("Email");
+
+fetch("/doctors/"+id,{
+
+method:"PUT",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+name:name,
+
+specialization:specialization,
+
+phone:phone,
+
+email:email
+
+})
+
+})
+
+.then(res=>res.json())
+
+.then(data=>{
+
+alert(data.message);
+
+loadDoctors();
+
+});
+
+}
+
+</script>
+
+{% endblock %}

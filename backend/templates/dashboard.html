@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">
+
+Dashboard
+
+</h2>
+
+<div class="row">
+
+<div class="col-md-3">
+
+<div class="card text-white bg-primary shadow">
+
+<div class="card-body">
+
+<h5>Total Pets</h5>
+
+<h1 id="pets">0</h1>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card text-white bg-success shadow">
+
+<div class="card-body">
+
+<h5>Total Owners</h5>
+
+<h1 id="owners">0</h1>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card text-white bg-warning shadow">
+
+<div class="card-body">
+
+<h5>Doctors</h5>
+
+<h1 id="doctors">0</h1>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card text-white bg-danger shadow">
+
+<div class="card-body">
+
+<h5>Appointments</h5>
+
+<h1 id="appointments">0</h1>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<hr class="my-4">
+
+<div class="row">
+
+<div class="col-md-8">
+
+<div class="card shadow">
+
+<div class="card-header bg-info text-white">
+
+Recent Appointments
+
+</div>
+
+<div class="card-body">
+
+<table class="table table-striped">
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+
+<th>Pet</th>
+
+<th>Doctor</th>
+
+<th>Date</th>
+
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody id="appointmentTable">
+
+<tr>
+
+<td colspan="5" class="text-center">
+
+Loading...
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow">
+
+<div class="card-header bg-secondary text-white">
+
+Quick Actions
+
+</div>
+
+<div class="card-body d-grid gap-3">
+
+<a href="/pets" class="btn btn-primary">
+
+➕ Manage Pets
+
+</a>
+
+<a href="/owners" class="btn btn-success">
+
+👨‍👩‍👧 Manage Owners
+
+</a>
+
+<a href="/appointments" class="btn btn-warning">
+
+📅 Book Appointment
+
+</a>
+
+<a href="/doctors" class="btn btn-danger">
+
+👨‍⚕️ Doctors
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+fetch("/dashboard")
+
+.then(response => response.json())
+
+.then(data => {
+
+document.getElementById("pets").innerHTML=data.pets;
+
+document.getElementById("owners").innerHTML=data.owners;
+
+document.getElementById("doctors").innerHTML=data.doctors;
+
+document.getElementById("appointments").innerHTML=data.appointments;
+
+});
+
+fetch("/appointments")
+
+.then(response=>response.json())
+
+.then(data=>{
+
+let rows="";
+
+data.forEach(item=>{
+
+rows+=`
+
+<tr>
+
+<td>${item.id}</td>
+
+<td>${item.pet_id}</td>
+
+<td>${item.doctor_id}</td>
+
+<td>${item.appointment_date}</td>
+
+<td>${item.status}</td>
+
+</tr>
+
+`;
+
+});
+
+document.getElementById("appointmentTable").innerHTML=rows;
+
+});
+
+</script>
+
+{% endblock %}
