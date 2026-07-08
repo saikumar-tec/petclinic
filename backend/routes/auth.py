@@ -12,27 +12,30 @@ def login():
 
     data = request.get_json()
 
-    username = data.get("username")
-    password = data.get("password")
+    email = data["email"]
+    password = data["password"]
 
-    # Default Admin Credentials
-    if username == "admin" and password == "admin123":
+    user = User.query.filter_by(email=email).first()
 
-        session["loggedIn"] = True
-        session["username"] = username
+    if not user:
+        return jsonify({"message":"User not found"}),404
 
-        return jsonify({
+    if user.password != password:
+        return jsonify({"message":"Invalid Password"}),401
 
-            "message": "Login Successful",
-            "username": username
-
-        }), 200
+    session["loggedIn"] = True
+    session["role"] = user.role
+    session["username"] = user.fullname
 
     return jsonify({
 
-        "message": "Invalid Username or Password"
+        "message":"Login Successful",
 
-    }), 401
+        "role":user.role,
+
+        "username":user.fullname
+
+    })
 
 
 #########################################################
