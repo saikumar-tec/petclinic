@@ -59,9 +59,7 @@ document.getElementById("doctorForm").addEventListener("submit", function(e){
     const doctor = {
 
         name: document.getElementById("name").value,
-
         specialization: document.getElementById("specialization").value,
-
         phone: document.getElementById("phone").value
 
     };
@@ -69,19 +67,13 @@ document.getElementById("doctorForm").addEventListener("submit", function(e){
     fetch(DOCTOR_API, {
 
         method: "POST",
-
         headers: {
-
             "Content-Type": "application/json"
-
         },
-
         body: JSON.stringify(doctor)
 
     })
-
     .then(response => response.json())
-
     .then(data => {
 
         alert(data.message);
@@ -91,22 +83,10 @@ document.getElementById("doctorForm").addEventListener("submit", function(e){
         loadDoctors();
 
     })
-
     .catch(error => {
 
         console.error("Error Adding Doctor:", error);
 
     });
 
-}
-
-
-// ================================
-// Load Doctors on Page Load
-// ================================
-
-window.onload = function () {
-
-    loadDoctors();
-
-};
+});

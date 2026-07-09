@@ -25,7 +25,7 @@ spec:
 
       - name: frontend
 
-        image: saikumaar/petclinic01:v1
+        image: saikumaar/petclinic00:v1
 
         ports:
 
