@@ -5,7 +5,7 @@
 
 // Backend API URL
 // Local Docker
-const API_URL = "http://localhost:5000";
+const API_URL = "/api";
 
 // For Kubernetes/AKS with Ingress later
 // const API_URL = "/api";
